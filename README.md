@@ -250,24 +250,41 @@ All settings in `.env`:
 
 ```bash
 # Ollama (local LLM server)
-OLLAMA_BASE_URL=http://localhost:11434
-MODEL_NAME=qwen2.5:3b
+# Ollama
+OLLAMA_BASE_URL=https://ollama.com
+OLLAMA_API_KEY=
+MODEL_NAME=kimi-k2.5:cloud
+EMBED_BASE_URL=http://localhost:11434
+EMBED_API_KEY=
 EMBED_MODEL=nomic-embed-text
 
-# Qdrant (vector database)
-QDRANT_URL=http://localhost:6333
+# Paths
+DOCUMENT_DIR=./internal_reports
+
+# Paths
+DOCUMENT_DIR=./internal_reports
+
+# Chunking
+CHUNK_SIZE=1000
+CHUNK_OVERLAP=200
+
+# Retrieval
+TOP_K=8
+SIMILARITY_THRESHOLD=0.20
+GENERATION_TOP_K=4
+MAX_SOURCE_CHARS=500
+
+# Qdrant
 QDRANT_COLLECTION=consultant_kb
+VECTOR_SIZE=768
+QDRANT_PATH=
+QDRANT_URL=http://localhost:6333
 
-# Retrieval tuning
-TOP_K=4                        # Chunks to retrieve
-SIMILARITY_THRESHOLD=0.35      # Min relevance score (0–1)
-CHUNK_SIZE=768                 # Tokens per chunk
-CHUNK_OVERLAP=128              # Overlap between chunks
-
-# Cost control
-GENERATION_TOP_K=4             # Sources to use for answer
-MAX_OUTPUT_TOKENS=600          # Answer length limit
-LLM_NUM_CTX=2048               # Context window
+# API
+API_HOST=127.0.0.1
+API_PORT=8000
+LLM_NUM_CTX=8192
+MAX_OUTPUT_TOKENS=4096
 ```
 
 ---
