@@ -1,0 +1,93 @@
+# Consultant Knowledge RAG — .gitignore
+#
+# Prevents accidental commit of secrets, configs, and build artifacts.
+# IMPORTANT: Never commit .env file!
+
+# ─────────────────────────────────────────────────────────────
+# SECRETS & CONFIGURATION
+# ─────────────────────────────────────────────────────────────
+.env                    # Local configuration (NEVER commit!)
+.env.local              # Local overrides
+.env.*.local            # Environment-specific configs
+secrets.json            # Tenant API keys
+.secrets.baseline       # Detect-secrets baseline
+
+# ─────────────────────────────────────────────────────────────
+# PYTHON
+# ─────────────────────────────────────────────────────────────
+__pycache__/            # Compiled Python files
+*.py[cod]              # Python cache
+*.so                   # C extensions
+.Python                # Virtual environment (if in repo)
+*.egg-info/            # Egg metadata
+dist/                  # Distribution
+build/                 # Build artifacts
+.venv/                 # Virtual environment
+venv/                  # Virtual environment
+ENV/                   # Virtual environment
+
+# ─────────────────────────────────────────────────────────────
+# IDE & EDITOR
+# ─────────────────────────────────────────────────────────────
+.vscode/               # VS Code settings
+.idea/                 # PyCharm
+*.swp                  # Vim swap files
+*.swo                  # Vim swap files
+*~                     # Vim backup
+.DS_Store              # macOS
+Thumbs.db              # Windows
+
+# ─────────────────────────────────────────────────────────────
+# DATA & ARTIFACTS
+# ─────────────────────────────────────────────────────────────
+qdrant_storage/        # Vector database (local)
+qdrant_data/           # Qdrant backup files
+internal_reports/      # Your confidential documents
+*.sqlite               # Database files
+feedback_log.jsonl     # User feedback logs (can be large)
+
+# ─────────────────────────────────────────────────────────────
+# DOCKER
+# ─────────────────────────────────────────────────────────────
+.dockerignore           # Docker ignore file (if separate)
+
+# ─────────────────────────────────────────────────────────────
+# LOGS & TEMP
+# ─────────────────────────────────────────────────────────────
+*.log                  # Log files
+logs/                  # Log directory
+*.tmp                  # Temporary files
+.pytest_cache/         # Pytest cache
+
+# ─────────────────────────────────────────────────────────────
+# OS-SPECIFIC
+# ─────────────────────────────────────────────────────────────
+.AppleDouble           # macOS resource fork
+.LSOverride            # macOS icon
+._*                    # macOS hidden files
+.TemporaryItems        # macOS
+.Spotlight-V100        # macOS search index
+.Trashes               # macOS
+
+# ─────────────────────────────────────────────────────────────
+# OPTIONAL: GIT LFS (Large File Storage)
+# ─────────────────────────────────────────────────────────────
+# If using git-lfs for large documents:
+# *.pdf filter=lfs diff=lfs merge=lfs -text
+# *.docx filter=lfs diff=lfs merge=lfs -text
+
+# ─────────────────────────────────────────────────────────────
+# NOTES
+# ─────────────────────────────────────────────────────────────
+#
+# CRITICAL: Never commit .env file!
+# It contains API keys, secrets, and sensitive config.
+#
+# If you accidentally committed a secret:
+# 1. Immediately rotate the key/secret
+# 2. Use git-filter-branch or BFG to remove from history
+# 3. Force push (only if repo not shared)
+#
+# More info: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
+#
+# ─────────────────────────────────────────────────────────────

@@ -1,0 +1,186 @@
+version: '3.8'
+
+services:
+  # Ollama — Local LLM Server
+  # Provides models: qwen2.5:3b, nomic-embed-text
+  ollama:
+    image: ollama/ollama:latest
+    container_name: consultant-rag-ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    ports:
+      - "11434:11434"
+    volumes:
+      # Persist downloaded models
+      - ollama_models:/root/.ollama
+    networks:
+      - consultant-rag-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    # Optional: GPU acceleration (uncomment for CUDA support)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Qdrant — Vector Database
+  # Stores and searches document embeddings
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: consultant-rag-qdrant
+    restart: unless-stopped
+    environment:
+      - QDRANT_API_KEY=  # Optional: set for authentication
+    ports:
+      # REST API
+      - "6333:6333"
+      # gRPC (faster, optional)
+      - "6334:6334"
+    volumes:
+      # Persist vector data
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - consultant-rag-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # FastAPI Application
+  # Serves the RAG API and web UI
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: consultant-rag-app
+    restart: unless-stopped
+    environment:
+      # Load from .env file
+      PYTHONUNBUFFERED: 1
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount document directory (for volume-based uploads)
+      - ./internal_reports:/app/internal_reports
+      # Mount feedback logs (for persistence)
+      - ./feedback_log.jsonl:/app/feedback_log.jsonl
+      # Optional: mount qdrant storage directly (for backup/restore)
+      # - ./qdrant_storage:/app/qdrant_storage
+    networks:
+      - consultant-rag-net
+    depends_on:
+      ollama:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  consultant-rag-net:
+    driver: bridge
+
+volumes:
+  # Ollama models (persistent across container restarts)
+  ollama_models:
+    driver: local
+  
+  # Qdrant vector data (persistent across container restarts)
+  qdrant_storage:
+    driver: local
+
+# ─────────────────────────────────────────────────────────────
+# USAGE
+# ─────────────────────────────────────────────────────────────
+#
+# 1. Build and start all services:
+#    docker-compose up --build
+#
+# 2. In another terminal, pull models (first time only):
+#    docker exec consultant-rag-ollama ollama pull qwen2.5:3b
+#    docker exec consultant-rag-ollama ollama pull nomic-embed-text
+#
+# 3. Access the app:
+#    - Web UI: http://localhost:8000
+#    - API Docs: http://localhost:8000/docs
+#    - Qdrant Dashboard: http://localhost:6333/dashboard
+#
+# 4. Monitor logs:
+#    docker-compose logs -f fastapi
+#    docker-compose logs -f ollama
+#    docker-compose logs -f qdrant
+#
+# 5. Stop all services:
+#    docker-compose down
+#
+# 6. Clean up (remove volumes):
+#    docker-compose down -v
+#
+# ─────────────────────────────────────────────────────────────
+# CONFIGURATION
+# ─────────────────────────────────────────────────────────────
+#
+# All app configuration is in .env file (see .env.example).
+#
+# Key settings:
+#   - OLLAMA_BASE_URL: http://ollama:11434 (use service name)
+#   - QDRANT_URL: http://qdrant:6333
+#   - MODEL_NAME: qwen2.5:3b
+#   - EMBED_MODEL: nomic-embed-text
+#
+# ─────────────────────────────────────────────────────────────
+# TROUBLESHOOTING
+# ─────────────────────────────────────────────────────────────
+#
+# Q: Models not found?
+# A: Run: docker exec consultant-rag-ollama ollama pull qwen2.5:3b
+#
+# Q: Vector DB not starting?
+# A: Check disk space: docker system df
+#    Clean up: docker system prune -a
+#
+# Q: API responds with "Service Unavailable"?
+# A: Check Ollama health: docker-compose logs ollama
+#    Check Qdrant health: docker-compose logs qdrant
+#
+# Q: Want to use GPU?
+# A: Uncomment GPU section in ollama service
+#    Requires nvidia-docker: https://github.com/NVIDIA/nvidia-docker
+#
+# ─────────────────────────────────────────────────────────────
+# PRODUCTION DEPLOYMENT
+# ─────────────────────────────────────────────────────────────
+#
+# For production, consider:
+#
+# 1. Use secrets (Docker Secrets or Vault) instead of .env
+# 2. Add reverse proxy (nginx) with SSL/TLS
+# 3. Enable authentication (API keys in middleware)
+# 4. Add resource limits:
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '2'
+#          memory: 4G
+# 5. Use external storage (NFS, S3) for documents
+# 6. Enable monitoring (Prometheus, Grafana)
+# 7. Set up logging aggregation (ELK, Datadog)
+#
+# See ARCHITECTURE.md and SECURITY.md for details.
+#
+# ─────────────────────────────────────────────────────────────
