@@ -44,7 +44,7 @@ Consulting firms spend **40+ hours/week** manually searching for past recommenda
 |--------|--------|
 | **Research Time** | -60% (from 2h to 40m per query) |
 | **Knowledge Reuse** | +3x (reduce duplicated work) |
-| **Deployment Cost** | ~$500/year (VM + compute) vs $50k+/year for API-based solutions |
+| **Deployment Cost** | Currently $0 cost, ~$500/year (VM + compute) vs $50k+/year for API-based solutions |
 | **Data Security** | ✅ On-premises, no third-party API access |
 | **Time to Production** | 1 week (this PoC → production with Docker) |
 
