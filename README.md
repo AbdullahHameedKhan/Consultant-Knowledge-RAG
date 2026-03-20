@@ -42,7 +42,7 @@ Consulting firms spend **40+ hours/week** manually searching for past recommenda
 
 | Metric | Impact |
 |--------|--------|
-| **Research Time** | -60% (from 2h to 40m per query) |
+| **Research Time** | -60% (from 40hr/weeK to 3-4 seconds per query) |
 | **Knowledge Reuse** | +3x (reduce duplicated work) |
 | **Deployment Cost** | Currently $0 cost, ~$500/year (VM + compute) vs $50k+/year for API-based solutions |
 | **Data Security** | ✅ On-premises, no third-party API access |
@@ -54,7 +54,7 @@ Consulting firms spend **40+ hours/week** manually searching for past recommenda
 
 ### Prerequisites
 - Python 3.11+
-- [Ollama](https://ollama.ai) (5 min install)
+- [Ollama](https://ollama.ai) (2 min install)
 - Docker (optional, but recommended for deployment)
 
 ### Setup (5 minutes)
